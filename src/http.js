@@ -1,7 +1,9 @@
+const https = require('https');
 const http = require('http');
 const xml2jsparser = require('xml2js').parseString;
 
-module.exports.sendHttp = async function (_data, _host, _port, _path, _auth) {
+module.exports.sendHttp = async function (_data, _host, _port, _path, _auth, _params = {protocol: 'http'}) {
+
     var xmlRequest = _data;
     var options = {
         host: _host,
@@ -15,9 +17,20 @@ module.exports.sendHttp = async function (_data, _host, _port, _path, _auth) {
             'Content-Length': Buffer.byteLength(xmlRequest)
         },
     };
-    //var http = params.protocol == 'https' ? require('https') : require('http');
+    var requestMethod = http;
+
+    if(_params.protocol === 'https') {
+        options.rejectUnauthorized = false;
+        options.requestCert = true;
+        options.agent = false;
+        requestMethod = https;
+    }
+
+    console.log(options)
+    console.log(_params)
+
     return new Promise((resolve, reject) => {
-        var req = http.request(options, (res) => {
+        var req = requestMethod.request(options, (res) => {
             if (res.statusCode < 200 || res.statusCode > 299) {
                 reject(new Error('Failed to process the request, status Code: ', res.statusCode));
             }

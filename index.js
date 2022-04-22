@@ -6,13 +6,14 @@ module.exports = {
     command: command
 };
 
-module.exports.runCommand = async function (_command, _host, _username, _password, _port, _usePowershell = false) {
+module.exports.runCommand = async function (_command, _host, _username, _password, _port, _usePowershell = false, _protocol = 'http') {
     try {
         var auth = 'Basic ' + Buffer.from(_username + ':' + _password, 'utf8').toString('base64');
         var params = {
             host: _host,
             port: _port,
             path: '/wsman',
+            protocol: _protocol
         };
         params['auth'] = auth;
         var shellId = await shell.doCreateShell(params);
@@ -39,6 +40,6 @@ module.exports.runCommand = async function (_command, _host, _username, _passwor
    
 };
 
-module.exports.runPowershell = async function (_command, _host, _username, _password, _port) {
-  return module.exports.runCommand(_command, _host, _username, _password, _port, true);
+module.exports.runPowershell = async function (_command, _host, _username, _password, _port, _protocol = 'http') {
+  return module.exports.runCommand(_command, _host, _username, _password, _port, true, _protocol);
 }
